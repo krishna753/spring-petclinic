@@ -33,6 +33,10 @@
       <input
         th:replace="~{fragments/inputField :: input ('Date', 'date', 'date')}"  />
       <input
+        th:replace="~{fragments/inputField :: input ('Start Time', 'startTime', 'text')}"  />
+      <input
+        th:replace="~{fragments/inputField :: input ('End Time', 'endTime', 'text')}"  />
+      <input
         th:replace="~{fragments/inputField :: input ('Description', 'description', 'text')}" />
     </div>
 
@@ -45,6 +49,19 @@
   </form>
 
   <br />
+  <b>Upcoming Visits</b>
+  <table class="table table-striped">
+    <tr>
+      <th>Date</th>
+      <th>Description</th>
+    </tr>
+    <tr th:if="${!upcomingVisit['new']}" th:each="upcomingVisit : ${ipet.visits}">
+      <td th:text="${#temporals.format(upcomingVisit.date, 'yyyy-MM-dd')}"></td>
+      <td th:text=" ${upcomingVisit.description}"></td>
+    </tr>
+  </table>
+
+
   <b>Previous Visits</b>
   <table class="table table-striped">
     <tr>
@@ -56,6 +73,7 @@
       <td th:text=" ${visit.description}"></td>
     </tr>
   </table>
+
 
 </body>
 </html>

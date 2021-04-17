@@ -39,6 +39,28 @@ public class Visit extends BaseEntity {
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate date;
 
+	public String getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(String startTime) {
+		this.startTime = startTime;
+	}
+
+	public String getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(String endTime) {
+		this.endTime = endTime;
+	}
+
+	@Column(name = "start_time")
+	private String startTime;
+
+	@Column(name = "end_time")
+	private String endTime;
+
 	@NotEmpty
 	@Column(name = "description")
 	private String description;

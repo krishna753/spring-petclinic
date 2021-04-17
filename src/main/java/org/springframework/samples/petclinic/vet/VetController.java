@@ -16,9 +16,20 @@
 package org.springframework.samples.petclinic.vet;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
+import javax.validation.Valid;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,10 +41,67 @@ import java.util.Map;
 @Controller
 class VetController {
 
+	private static final String VIEWS_VET_CREATE_OR_UPDATE_FORM = "vets/createOrUpdateVetForm";
+
 	private final VetRepository vets;
 
-	public VetController(VetRepository clinicService) {
+	private final VetSpecialitiesRepository vetSpecialities;
+
+	public VetController(VetRepository clinicService, VetSpecialitiesRepository vetSpecialities) {
 		this.vets = clinicService;
+		this.vetSpecialities = vetSpecialities;
+	}
+
+	@ModelAttribute("specialties")
+	public Collection<Specialties> populateSpecialtyTypes() {
+		return this.vets.findSpecialtyTypes();
+	}
+
+	@InitBinder
+	public void setAllowedFields(WebDataBinder dataBinder) {
+		dataBinder.setDisallowedFields("id");
+	}
+
+	@GetMapping("/vets/new")
+	public String initCreationForm(ModelMap model) {
+		Vet vet = new Vet();
+		model.put("vet", vet);
+		return VIEWS_VET_CREATE_OR_UPDATE_FORM;
+	}
+
+	@PostMapping("/vets/new")
+	public String processCreationForm(@Valid Vet vet, String specialties, BindingResult result, ModelMap model) {
+		if (result.hasErrors()) {
+			model.put("vet", vet);
+			return VIEWS_VET_CREATE_OR_UPDATE_FORM;
+		}
+		else {
+			this.vets.save(vet);
+			VetSpecialties vetSpecialties = new VetSpecialties();
+			List<Specialties> specialtyList = (List<Specialties>) model.getAttribute("specialties");
+			for (Specialties specialty : specialtyList) {
+				if (specialty.getName().equalsIgnoreCase(specialties)) {
+					vetSpecialties.setVet_id(vet.getId());
+					vetSpecialties.setSpecialty_id(specialty.getId());
+					break;
+				}
+			}
+			this.vetSpecialities.save(vetSpecialties);
+			return "redirect:/vets/" + vet.getId();
+		}
+	}
+
+	/**
+	 * Custom handler for displaying an vet.
+	 * @param vetId the ID of the vet to display
+	 * @return a ModelMap with the model attributes for the view
+	 */
+	@GetMapping("/vet/{vetId}")
+	public ModelAndView showOwner(@PathVariable("vetId") int vetId) {
+		ModelAndView mav = new ModelAndView("vet/vetDetails");
+		Vet vet = this.vets.findById(vetId);
+		mav.addObject(vet);
+		return mav;
 	}
 
 	@GetMapping("/vets.html")
