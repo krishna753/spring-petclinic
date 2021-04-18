@@ -66,9 +66,9 @@ class VetController {
 		}
 		else {
 			Collection<Specialty> allSpecialties = specialtyRepository.findAll();
-			for(String sp:specialties){
+			for (String sp : specialties) {
 				Specialty selectedSpecialty = allSpecialties.stream().filter(p -> p.getName().equalsIgnoreCase(sp))
-					.findFirst().get();
+						.findFirst().get();
 				selectedSpecialty.getVets().add(vet);
 				vet.addSpecialty(selectedSpecialty);
 			}

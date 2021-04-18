@@ -15,6 +15,7 @@
  */
 package org.springframework.samples.petclinic.owner;
 
+import org.springframework.samples.petclinic.model.TimeSlots;
 import org.springframework.samples.petclinic.visit.Visit;
 import org.springframework.samples.petclinic.visit.VisitRepository;
 import org.springframework.stereotype.Controller;
@@ -46,7 +47,10 @@ class VisitController {
 		this.visits = visits;
 		this.pets = pets;
 	}
-
+	@ModelAttribute("timeSlots")
+	public String[] populateTimeSlots() {
+		return TimeSlots.getList();
+	}
 	@InitBinder
 	public void setAllowedFields(WebDataBinder dataBinder) {
 		dataBinder.setDisallowedFields("id");

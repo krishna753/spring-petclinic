@@ -38,22 +38,6 @@ public class Visit extends BaseEntity {
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate date;
 
-	public String getStartTime() {
-		return startTime;
-	}
-
-	public void setStartTime(String startTime) {
-		this.startTime = startTime;
-	}
-
-	public String getEndTime() {
-		return endTime;
-	}
-
-	public void setEndTime(String endTime) {
-		this.endTime = endTime;
-	}
-
 	@Column(name = "start_time")
 	private String startTime;
 
@@ -96,6 +80,22 @@ public class Visit extends BaseEntity {
 
 	public void setPetId(Integer petId) {
 		this.petId = petId;
+	}
+
+	public String getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(String startTime) {
+		this.startTime = startTime;
+	}
+
+	public String getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(String endTime) {
+		this.endTime = endTime;
 	}
 
 }

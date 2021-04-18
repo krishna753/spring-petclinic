@@ -33,9 +33,9 @@
       <input
         th:replace="~{fragments/inputField :: input ('Date', 'date', 'date')}"  />
       <input
-        th:replace="~{fragments/inputField :: input ('Start Time', 'startTime', 'text')}"  />
+        th:replace="~{fragments/selectField :: select ('Start Time', 'startTime', ${timeSlots})}" />
       <input
-        th:replace="~{fragments/inputField :: input ('End Time', 'endTime', 'text')}"  />
+        th:replace="~{fragments/selectField :: select ('End Time', 'endTime', ${timeSlots})}" />
       <input
         th:replace="~{fragments/inputField :: input ('Description', 'description', 'text')}" />
     </div>
