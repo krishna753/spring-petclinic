@@ -56,5 +56,4 @@ public class Specialty extends NamedEntity implements Serializable {
 		this.vets = vets;
 	}
 
-
 }

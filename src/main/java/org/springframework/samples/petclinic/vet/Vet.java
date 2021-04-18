@@ -35,8 +35,7 @@ import java.util.*;
 @Table(name = "vets")
 public class Vet extends Person {
 
-
-	@ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE})
+	@ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE })
 	@JoinTable(name = "vet_specialties", joinColumns = @JoinColumn(name = "vet_id"),
 			inverseJoinColumns = @JoinColumn(name = "specialty_id"))
 	private Set<Specialty> specialties;
@@ -66,6 +65,7 @@ public class Vet extends Person {
 	public void addSpecialty(Specialty specialty) {
 		getSpecialtiesInternal().add(specialty);
 	}
+
 	public void removeSpecialty(Specialty specialty) {
 		getSpecialtiesInternal().remove(specialty);
 	}

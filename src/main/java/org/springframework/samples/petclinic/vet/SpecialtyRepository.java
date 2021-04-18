@@ -40,7 +40,7 @@ public interface SpecialtyRepository extends Repository<Specialty, Integer> {
 	 * @return a <code>Collection</code> of <code>Vet</code>s
 	 */
 	@Transactional(readOnly = true)
-//	@Cacheable("specialty")
+	// @Cacheable("specialty")
 	Collection<Specialty> findAll() throws DataAccessException;
 
 	/**
@@ -51,12 +51,10 @@ public interface SpecialtyRepository extends Repository<Specialty, Integer> {
 	@Transactional(readOnly = true)
 	Specialty findById(Integer id);
 
-
 	/**
 	 * Save a {@link Specialty} to the data store, either inserting or updating it.
 	 * @param specialty the {@link Specialty} to save
 	 */
 	void save(Specialty specialty);
-
 
 }

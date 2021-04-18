@@ -15,15 +15,14 @@
  */
 package org.springframework.samples.petclinic.visit;
 
-import java.time.LocalDate;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.samples.petclinic.model.BaseEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
-
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.samples.petclinic.model.BaseEntity;
+import java.time.LocalDate;
 
 /**
  * Simple JavaBean domain object representing a visit.
@@ -38,6 +37,28 @@ public class Visit extends BaseEntity {
 	@Column(name = "visit_date")
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate date;
+
+	public String getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(String startTime) {
+		this.startTime = startTime;
+	}
+
+	public String getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(String endTime) {
+		this.endTime = endTime;
+	}
+
+	@Column(name = "start_time")
+	private String startTime;
+
+	@Column(name = "end_time")
+	private String endTime;
 
 	@NotEmpty
 	@Column(name = "description")

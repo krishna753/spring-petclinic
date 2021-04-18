@@ -15,20 +15,18 @@
  */
 package org.springframework.samples.petclinic.owner;
 
-import java.util.Map;
-
-import javax.validation.Valid;
-
 import org.springframework.samples.petclinic.visit.Visit;
 import org.springframework.samples.petclinic.visit.VisitRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Juergen Hoeller
@@ -61,11 +59,26 @@ class VisitController {
 	 * @param petId
 	 * @return Pet
 	 */
+
 	@ModelAttribute("visit")
-	public Visit loadPetWithVisit(@PathVariable("petId") int petId, Map<String, Object> model) {
+	public Visit loadPetWithPreviousVisit(@PathVariable("petId") int petId, Map<String, Object> model) {
 		Pet pet = this.pets.findById(petId);
-		pet.setVisitsInternal(this.visits.findByPetId(petId));
+		List<Visit> visits = this.visits.findByPetId(petId).stream().filter(v -> LocalDate.now().isAfter(v.getDate()))
+				.collect(Collectors.toList());
+		pet.setVisitsInternal(visits);
 		model.put("pet", pet);
+		Visit visit = new Visit();
+		pet.addVisit(visit);
+		return visit;
+	}
+
+	@ModelAttribute("upcomingVisit")
+	public Visit loadPetWithUpcomingVisit(@PathVariable("petId") int petId, Map<String, Object> model) {
+		Pet pet = this.pets.findById(petId);
+		List<Visit> visits = this.visits.findByPetId(petId).stream().filter(v -> LocalDate.now().isBefore(v.getDate()))
+				.collect(Collectors.toList());
+		pet.setVisitsInternal(visits);
+		model.put("ipet", pet);
 		Visit visit = new Visit();
 		pet.addVisit(visit);
 		return visit;
@@ -85,6 +98,17 @@ class VisitController {
 		}
 		else {
 			this.visits.save(visit);
+			return "redirect:/owners/{ownerId}";
+		}
+	}
+
+	@PostMapping("/owners/{ownerId}/pets/{petId}/visits{visitId}/delete")
+	public String processDeleteVisitForm(@Valid Visit visit, BindingResult result) {
+		if (result.hasErrors()) {
+			return "pets/createOrUpdateVisitForm";
+		}
+		else {
+			this.visits.deleteVisitById(visit.getId());
 			return "redirect:/owners/{ownerId}";
 		}
 	}

@@ -38,20 +38,21 @@ class VetController {
 	private static final String VIEWS_VETS_CREATE_OR_UPDATE_FORM = "vets/createOrUpdateVetForm";
 
 	private final VetRepository vets;
+
 	private final SpecialtyRepository specialtyRepository;
 
 	public VetController(VetRepository clinicService, SpecialtyRepository specialtyRepository) {
 		this.vets = clinicService;
 		this.specialtyRepository = specialtyRepository;
 	}
+
 	@ModelAttribute("specialties")
 	public Collection<Specialty> populateSpecialties() {
 		return this.vets.findSpecialties();
 	}
 
-
 	@GetMapping("/vets/new")
-	public String initCreationForm( ModelMap model) {
+	public String initCreationForm(ModelMap model) {
 		Vet vet = new Vet();
 		model.put("vet", vet);
 		return VIEWS_VETS_CREATE_OR_UPDATE_FORM;
@@ -65,7 +66,8 @@ class VetController {
 		}
 		else {
 			Collection<Specialty> allSpecialties = specialtyRepository.findAll();
-			Specialty selectedSpecialty = allSpecialties.stream().filter(p->p.getName().equalsIgnoreCase(specialties)).findFirst().get();
+			Specialty selectedSpecialty = allSpecialties.stream().filter(p -> p.getName().equalsIgnoreCase(specialties))
+					.findFirst().get();
 			selectedSpecialty.getVets().add(vet);
 			vet.addSpecialty(selectedSpecialty);
 
