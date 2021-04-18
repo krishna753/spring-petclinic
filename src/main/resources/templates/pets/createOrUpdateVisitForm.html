@@ -31,11 +31,18 @@
   <form th:object="${visit}" class="form-horizontal" method="post">
     <div class="form-group has-feedback">
       <input
+        th:replace="~{fragments/dropDown :: select ('Vets', 'vetId', ${vets})}" />
+<!--      <select th:field="*{vetId}">-->
+<!--        <option value=""> &#45;&#45; </option>-->
+<!--        <option th:each="vet : ${vets}"-->
+<!--                th:value="${vet.id}"-->
+<!--                th:utext="${vet.toString()}"/>-->
+      <input
         th:replace="~{fragments/inputField :: input ('Date', 'date', 'date')}"  />
       <input
-        th:replace="~{fragments/selectField :: select ('Start Time', 'startTime', ${timeSlots})}" />
-      <input
-        th:replace="~{fragments/selectField :: select ('End Time', 'endTime', ${timeSlots})}" />
+        th:replace="~{fragments/selectField :: select ('Time slot', 'startTime', ${timeSlots})}" />
+<!--      <input-->
+<!--        th:replace="~{fragments/selectField :: select ('End Time', 'endTime', ${timeSlots})}" />-->
       <input
         th:replace="~{fragments/inputField :: input ('Description', 'description', 'text')}" />
     </div>
@@ -53,10 +60,12 @@
   <table class="table table-striped">
     <tr>
       <th>Date</th>
+      <th>Vet Name</th>
       <th>Description</th>
     </tr>
     <tr th:if="${!upcomingVisit['new']}" th:each="upcomingVisit : ${ipet.visits}">
       <td th:text="${#temporals.format(upcomingVisit.date, 'yyyy-MM-dd')}"></td>
+      <td th:text="${upcomingVisit?.firstName + ' ' + upcomingVisit?.lastName}"></td>
       <td th:text=" ${upcomingVisit.description}"></td>
     </tr>
   </table>
@@ -66,11 +75,13 @@
   <table class="table table-striped">
     <tr>
       <th>Date</th>
+      <th>Vet Name</th>
       <th>Description</th>
     </tr>
-    <tr th:if="${!visit['new']}" th:each="visit : ${pet.visits}">
-      <td th:text="${#temporals.format(visit.date, 'yyyy-MM-dd')}"></td>
-      <td th:text=" ${visit.description}"></td>
+    <tr th:if="${!visit['new']}" th:each="pastVisit : ${pet.visits}">
+      <td th:text="${#temporals.format(pastVisit.date, 'yyyy-MM-dd')}"></td>
+      <td th:text="${pastVisit?.firstName + ' ' + pastVisit?.lastName}"></td>
+      <td th:text=" ${pastVisit.description}"></td>
     </tr>
   </table>
 

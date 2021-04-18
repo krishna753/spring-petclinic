@@ -18,9 +18,7 @@ package org.springframework.samples.petclinic.visit;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.samples.petclinic.model.BaseEntity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import java.time.LocalDate;
 
@@ -32,6 +30,7 @@ import java.time.LocalDate;
  */
 @Entity
 @Table(name = "visits")
+@SecondaryTable(name = "vets", pkJoinColumns=@PrimaryKeyJoinColumn(name="id", referencedColumnName="id"))
 public class Visit extends BaseEntity {
 
 	@Column(name = "visit_date")
@@ -50,6 +49,25 @@ public class Visit extends BaseEntity {
 
 	@Column(name = "pet_id")
 	private Integer petId;
+
+
+	@Column(name = "vet_id")
+	private Integer vetId;
+
+	@Column(table="vets", name="first_name")
+	private String firstName;
+
+	@Column(table="vets", name="last_name")
+	private String lastName;
+
+
+	public Integer getVetId() {
+		return vetId;
+	}
+
+	public void setVetId(Integer vetId) {
+		this.vetId = vetId;
+	}
 
 	/**
 	 * Creates a new instance of Visit for the current date
@@ -96,6 +114,23 @@ public class Visit extends BaseEntity {
 
 	public void setEndTime(String endTime) {
 		this.endTime = endTime;
+	}
+
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
 
 }

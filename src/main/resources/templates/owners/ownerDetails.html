@@ -57,12 +57,18 @@
             <thead>
               <tr>
                 <th>Visit Date</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Vet Name</th>
                 <th>Description</th>
                 <th>Change Visit</th>
               </tr>
             </thead>
             <tr th:each="visit : ${pet.visits}">
               <td th:text="${#temporals.format(visit.date, 'yyyy-MM-dd')}"></td>
+              <td th:text="${visit.startTime}"></td>
+              <td th:text="${visit.endTime}"></td>
+              <td th:text="${visit?.firstName + ' ' + visit?.lastName}"></td>
               <td th:text="${visit?.description}"></td>
 <!--              krishna: added visit redirect-->
 <!--              <td><a-->

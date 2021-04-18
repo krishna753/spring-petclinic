@@ -15,7 +15,9 @@
  */
 package org.springframework.samples.petclinic.owner;
 
-import org.springframework.samples.petclinic.model.TimeSlots;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.samples.petclinic.vet.Vet;
+import org.springframework.samples.petclinic.vet.VetRepository;
 import org.springframework.samples.petclinic.visit.Visit;
 import org.springframework.samples.petclinic.visit.VisitRepository;
 import org.springframework.stereotype.Controller;
@@ -24,9 +26,9 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -43,14 +45,52 @@ class VisitController {
 
 	private final PetRepository pets;
 
-	public VisitController(VisitRepository visits, PetRepository pets) {
+	private final VetRepository vets;
+
+	@Value("${application.pet.visit.timeslot.duration}")
+	private Integer visitDuration;
+
+	public VisitController(VisitRepository visits, PetRepository pets, VetRepository vets) {
 		this.visits = visits;
 		this.pets = pets;
+		this.vets = vets;
 	}
+
+	@ModelAttribute("vets")
+	public Collection<Vet> populateVets() {
+//		return TimeSlots.getList();
+		return this.vets.findAll();
+	}
+
 	@ModelAttribute("timeSlots")
 	public String[] populateTimeSlots() {
-		return TimeSlots.getList();
+//		return TimeSlots.getList();
+		return getTimeSet(this.visitDuration);
 	}
+
+	private String[] getTimeSet( int visitDuration) {
+
+		Calendar cal = new GregorianCalendar();
+// reset hour, minutes, seconds and millis
+		cal.set(Calendar.HOUR_OF_DAY, 8);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+
+		SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
+		int slots = 540/visitDuration;
+		String[] results = new String[slots];
+		int index=0;
+		while (index < slots) {
+			String startTime = sdf.format(cal.getTime());
+			cal.add(Calendar.MINUTE, visitDuration);
+			String endTime = sdf.format(cal.getTime());
+
+			results[index++] =startTime+"-"+endTime;
+		}
+		return results;
+}
+
 	@InitBinder
 	public void setAllowedFields(WebDataBinder dataBinder) {
 		dataBinder.setDisallowedFields("id");
@@ -79,7 +119,9 @@ class VisitController {
 	@ModelAttribute("upcomingVisit")
 	public Visit loadPetWithUpcomingVisit(@PathVariable("petId") int petId, Map<String, Object> model) {
 		Pet pet = this.pets.findById(petId);
-		List<Visit> visits = this.visits.findByPetId(petId).stream().filter(v -> LocalDate.now().isBefore(v.getDate()))
+		List<Visit> visits = this.visits.findByPetId(petId).stream()
+			.filter(v -> LocalDate.now()
+				.isBefore(v.getDate()) || LocalDate.now().isEqual(v.getDate()))
 				.collect(Collectors.toList());
 		pet.setVisitsInternal(visits);
 		model.put("ipet", pet);
@@ -96,11 +138,14 @@ class VisitController {
 
 	// Spring MVC calls method loadPetWithVisit(...) before processNewVisitForm is called
 	@PostMapping("/owners/{ownerId}/pets/{petId}/visits/new")
-	public String processNewVisitForm(@Valid Visit visit, BindingResult result) {
+	public String processNewVisitForm(@Valid Visit visit, String vet, BindingResult result) {
 		if (result.hasErrors()) {
 			return "pets/createOrUpdateVisitForm";
 		}
 		else {
+			String[] timeSlots = visit.getStartTime().split("-");
+			visit.setStartTime(timeSlots[0]);
+			visit.setEndTime(timeSlots[1]);
 			this.visits.save(visit);
 			return "redirect:/owners/{ownerId}";
 		}

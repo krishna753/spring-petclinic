@@ -74,4 +74,8 @@ public class Vet extends Person {
 		return specialties;
 	}
 
+	public String toString() {
+		return this.getFirstName() + " " + this.getLastName();
+	}
+
 }
