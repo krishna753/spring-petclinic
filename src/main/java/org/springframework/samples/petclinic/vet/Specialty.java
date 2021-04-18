@@ -15,12 +15,12 @@
  */
 package org.springframework.samples.petclinic.vet;
 
-import java.io.Serializable;
-
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
 import org.springframework.samples.petclinic.model.NamedEntity;
+
+import javax.persistence.*;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Models a {@link Vet Vet's} specialty (for example, dentistry).
@@ -30,5 +30,31 @@ import org.springframework.samples.petclinic.model.NamedEntity;
 @Entity
 @Table(name = "specialties")
 public class Specialty extends NamedEntity implements Serializable {
+
+	@Id
+	@GeneratedValue
+	private Integer id;
+
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE, mappedBy = "specialties")
+	private Set<Vet> vets = new HashSet<>();
+
+	@Override
+	public Integer getId() {
+		return id;
+	}
+
+	@Override
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public Set<Vet> getVets() {
+		return vets;
+	}
+
+	public void setVets(Set<Vet> vets) {
+		this.vets = vets;
+	}
+
 
 }

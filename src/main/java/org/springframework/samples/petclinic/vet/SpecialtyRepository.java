@@ -16,12 +16,10 @@
 package org.springframework.samples.petclinic.vet;
 
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Repository class for <code>Vet</code> domain objects All method names are compliant
@@ -34,37 +32,31 @@ import java.util.List;
  * @author Sam Brannen
  * @author Michael Isvy
  */
-public interface VetRepository extends Repository<Vet, Integer> {
+
+public interface SpecialtyRepository extends Repository<Specialty, Integer> {
 
 	/**
 	 * Retrieve all <code>Vet</code>s from the data store.
 	 * @return a <code>Collection</code> of <code>Vet</code>s
 	 */
 	@Transactional(readOnly = true)
-	//@Cacheable("vets")
-	Collection<Vet> findAll() throws DataAccessException;
+//	@Cacheable("specialty")
+	Collection<Specialty> findAll() throws DataAccessException;
 
 	/**
-	 * Retrieve all {@link Specialty}s from the data store.
-	 * @return a Collection of {@link Specialty}s.
-	 */
-	@Query("SELECT stype FROM Specialty stype ORDER BY stype.name")
-	@Transactional(readOnly = true)
-	List<Specialty> findSpecialties();
-
-	/**
-	 * Retrieve a {@link Vet} from the data store by id.
+	 * Retrieve a {@link Specialty} from the data store by id.
 	 * @param id the id to search for
-	 * @return the {@link Vet} if found
+	 * @return the {@link Specialty} if found
 	 */
 	@Transactional(readOnly = true)
-	Vet findById(Integer id);
+	Specialty findById(Integer id);
+
 
 	/**
-	 * Save a {@link Vet} to the data store, either inserting or updating it.
-	 * @param vet the {@link Vet} to save
+	 * Save a {@link Specialty} to the data store, either inserting or updating it.
+	 * @param specialty the {@link Specialty} to save
 	 */
-	void save(Vet vet);
+	void save(Specialty specialty);
 
 
 }

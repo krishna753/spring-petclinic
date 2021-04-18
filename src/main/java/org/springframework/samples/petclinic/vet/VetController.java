@@ -16,9 +16,14 @@
 package org.springframework.samples.petclinic.vet;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -30,10 +35,43 @@ import java.util.Map;
 @Controller
 class VetController {
 
-	private final VetRepository vets;
+	private static final String VIEWS_VETS_CREATE_OR_UPDATE_FORM = "vets/createOrUpdateVetForm";
 
-	public VetController(VetRepository clinicService) {
+	private final VetRepository vets;
+	private final SpecialtyRepository specialtyRepository;
+
+	public VetController(VetRepository clinicService, SpecialtyRepository specialtyRepository) {
 		this.vets = clinicService;
+		this.specialtyRepository = specialtyRepository;
+	}
+	@ModelAttribute("specialties")
+	public Collection<Specialty> populateSpecialties() {
+		return this.vets.findSpecialties();
+	}
+
+
+	@GetMapping("/vets/new")
+	public String initCreationForm( ModelMap model) {
+		Vet vet = new Vet();
+		model.put("vet", vet);
+		return VIEWS_VETS_CREATE_OR_UPDATE_FORM;
+	}
+
+	@PostMapping("/vets/new")
+	public String processCreationForm(Vet vet, String specialties, BindingResult result, ModelMap model) {
+		if (result.hasErrors()) {
+			model.put("vet", vet);
+			return VIEWS_VETS_CREATE_OR_UPDATE_FORM;
+		}
+		else {
+			Collection<Specialty> allSpecialties = specialtyRepository.findAll();
+			Specialty selectedSpecialty = allSpecialties.stream().filter(p->p.getName().equalsIgnoreCase(specialties)).findFirst().get();
+			selectedSpecialty.getVets().add(vet);
+			vet.addSpecialty(selectedSpecialty);
+
+			this.vets.save(vet);
+			return "redirect:/vets.html";
+		}
 	}
 
 	@GetMapping("/vets.html")
