@@ -18,6 +18,7 @@ package org.springframework.samples.petclinic.vet;
 import org.springframework.beans.support.MutableSortDefinition;
 import org.springframework.beans.support.PropertyComparator;
 import org.springframework.samples.petclinic.model.Person;
+import org.springframework.samples.petclinic.visit.Visit;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
@@ -34,6 +35,11 @@ import java.util.*;
 @Entity
 @Table(name = "vets")
 public class Vet extends Person {
+
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "vet")
+	private List<Visit> visits;
+
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE })
 	@JoinTable(name = "vet_specialties", joinColumns = @JoinColumn(name = "vet_id"),

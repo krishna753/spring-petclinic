@@ -27,9 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author Juergen Hoeller
@@ -107,8 +105,9 @@ class VisitController {
 	@ModelAttribute("visit")
 	public Visit loadPetWithPreviousVisit(@PathVariable("petId") int petId, Map<String, Object> model) {
 		Pet pet = this.pets.findById(petId);
-		List<Visit> visits = this.visits.findByPetId(petId).stream().filter(v -> LocalDate.now().isAfter(v.getDate()))
-				.collect(Collectors.toList());
+//		List<Visit> visits = this.visits.findByPetId(petId).stream().filter(v -> LocalDate.now().isAfter(v.getDate()))
+//				.collect(Collectors.toList());
+		List<Visit> visits = this.visits.findByPetId(petId);
 		pet.setVisitsInternal(visits);
 		model.put("pet", pet);
 		Visit visit = new Visit();
@@ -116,19 +115,19 @@ class VisitController {
 		return visit;
 	}
 
-	@ModelAttribute("upcomingVisit")
-	public Visit loadPetWithUpcomingVisit(@PathVariable("petId") int petId, Map<String, Object> model) {
-		Pet pet = this.pets.findById(petId);
-		List<Visit> visits = this.visits.findByPetId(petId).stream()
-			.filter(v -> LocalDate.now()
-				.isBefore(v.getDate()) || LocalDate.now().isEqual(v.getDate()))
-				.collect(Collectors.toList());
-		pet.setVisitsInternal(visits);
-		model.put("ipet", pet);
-		Visit visit = new Visit();
-		pet.addVisit(visit);
-		return visit;
-	}
+//	@ModelAttribute("upcomingVisit")
+//	public Visit loadPetWithUpcomingVisit(@PathVariable("petId") int petId, Map<String, Object> model) {
+//		Pet pet = this.pets.findById(petId);
+//		List<Visit> visits = this.visits.findByPetId(petId).stream()
+//			.filter(v -> LocalDate.now()
+//				.isBefore(v.getDate()) || LocalDate.now().isEqual(v.getDate()))
+//				.collect(Collectors.toList());
+//		pet.setVisitsInternal(visits);
+//		model.put("upet", pet);
+//		Visit visit = new Visit();
+//		pet.addVisit(visit);
+//		return visit;
+//	}
 
 	// Spring MVC calls method loadPetWithVisit(...) before initNewVisitForm is called
 	@GetMapping("/owners/*/pets/{petId}/visits/new")
@@ -138,7 +137,7 @@ class VisitController {
 
 	// Spring MVC calls method loadPetWithVisit(...) before processNewVisitForm is called
 	@PostMapping("/owners/{ownerId}/pets/{petId}/visits/new")
-	public String processNewVisitForm(@Valid Visit visit, String vet, BindingResult result) {
+	public String processNewVisitForm(@Valid Visit visit, BindingResult result) {
 		if (result.hasErrors()) {
 			return "pets/createOrUpdateVisitForm";
 		}
