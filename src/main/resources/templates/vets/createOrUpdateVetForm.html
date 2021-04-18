@@ -15,7 +15,7 @@
       <input
         th:replace="~{fragments/inputField :: input ('Last Name', 'lastName', 'text')}" />
       <input
-        th:replace="~{fragments/selectField :: select ('Specialty', 'specialties', ${specialties})}" />
+        th:replace="~{fragments/multiSelectField :: selectpicker ('Specialty', 'specialties', ${specialties})}" />
     </div>
     <div class="form-group">
       <div class="col-sm-offset-2 col-sm-10">

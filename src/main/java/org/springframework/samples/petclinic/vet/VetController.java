@@ -59,17 +59,19 @@ class VetController {
 	}
 
 	@PostMapping("/vets/new")
-	public String processCreationForm(Vet vet, String specialties, BindingResult result, ModelMap model) {
+	public String processCreationForm(Vet vet, String[] specialties, BindingResult result, ModelMap model) {
 		if (result.hasErrors()) {
 			model.put("vet", vet);
 			return VIEWS_VETS_CREATE_OR_UPDATE_FORM;
 		}
 		else {
 			Collection<Specialty> allSpecialties = specialtyRepository.findAll();
-			Specialty selectedSpecialty = allSpecialties.stream().filter(p -> p.getName().equalsIgnoreCase(specialties))
+			for(String sp:specialties){
+				Specialty selectedSpecialty = allSpecialties.stream().filter(p -> p.getName().equalsIgnoreCase(sp))
 					.findFirst().get();
-			selectedSpecialty.getVets().add(vet);
-			vet.addSpecialty(selectedSpecialty);
+				selectedSpecialty.getVets().add(vet);
+				vet.addSpecialty(selectedSpecialty);
+			}
 
 			this.vets.save(vet);
 			return "redirect:/vets.html";
