@@ -1,5 +1,26 @@
 # Spring PetClinic - Craft Demo
 
+## Requirement
+Craft Demonstration
+ 
+Thank you so much for considering a Software Engineering position with Intuit! Please prepare the following below to bring with you onsite. I suggest spending the first 5 minutes introducing yourself professionally and personally. The instruction may be a little ambiguous, please do not be afraid to go above and beyond, add other things you think are important. We want to see your end to end thinking of solving this problem and what you consider to do so.
+ 
+Download, build and run a functional Pet Clinic. Git repo here:
+ 
+https://github.com/spring-projects/spring-petclinic
+ 
+Build a web application to allow adding a pet, adding a vet, scheduling an appointment for a
+pet, and displaying a list of appointments for a pet or a vet. 
+ 
+- Two pets cannot schedule for the same vet at the same time. 
+- Vets are available M-F 8am-5pm
+- Allow to cancel on an appointment
+- Front-end is an Admin Panel that allows the above functionality
+ 
+Please keep in mind that we would like to see your thought process on how you can scale this solution and we want to understand how you would design applications at scale and develop the framework.
+![image](https://user-images.githubusercontent.com/82562156/115271267-0026ba80-a0f2-11eb-9bbc-de9787f5ddc9.png)
+
+
 ## Estimations
 
 1. Capacity Calculations
