@@ -56,4 +56,6 @@ CREATE TABLE IF NOT EXISTS visits (
   description VARCHAR(255),
   FOREIGN KEY (pet_id) REFERENCES pets(id)
   FOREIGN KEY (vet_id) REFERENCES vets(id)
+  UNIQUE KEY(vet_id,visit_date,start_time)
+
 ) engine=InnoDB;

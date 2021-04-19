@@ -17,6 +17,8 @@ package org.springframework.samples.petclinic.visit;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.samples.petclinic.model.BaseEntity;
+import org.springframework.samples.petclinic.validator.PresentOrFuture;
+import org.springframework.samples.petclinic.validator.WeekDay;
 import org.springframework.samples.petclinic.vet.Vet;
 
 import javax.persistence.*;
@@ -35,6 +37,8 @@ public class Visit extends BaseEntity {
 
 	@Column(name = "visit_date")
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@PresentOrFuture(message = "Appointment date should not be in the past!")
+	@WeekDay(message = "Vets are available only during weekdays")
 	private LocalDate date;
 
 	@Column(name = "start_time")
@@ -61,7 +65,6 @@ public class Visit extends BaseEntity {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "vet_id")
 	private Vet vet;
-
 
 	/**
 	 * Creates a new instance of Visit for the current date

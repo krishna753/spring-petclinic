@@ -45,6 +45,7 @@ class VisitController {
 
 	private final VetRepository vets;
 
+	private final Integer MINUTES_BETWEEN_8AM_5PM = 9*60;
 	@Value("${application.pet.visit.timeslot.duration}")
 	private Integer visitDuration;
 
@@ -56,14 +57,17 @@ class VisitController {
 
 	@ModelAttribute("vets")
 	public Collection<Vet> populateVets() {
-//		return TimeSlots.getList();
 		return this.vets.findAll();
 	}
 
 	@ModelAttribute("timeSlots")
 	public String[] populateTimeSlots() {
-//		return TimeSlots.getList();
 		return getTimeSet(this.visitDuration);
+	}
+
+	@ModelAttribute("pageErrors")
+	public String populatePageErrors() {
+		return "";
 	}
 
 	private String[] getTimeSet( int visitDuration) {
@@ -76,7 +80,7 @@ class VisitController {
 		cal.set(Calendar.MILLISECOND, 0);
 
 		SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
-		int slots = 540/visitDuration;
+		int slots = MINUTES_BETWEEN_8AM_5PM/visitDuration;
 		String[] results = new String[slots];
 		int index=0;
 		while (index < slots) {
@@ -137,7 +141,7 @@ class VisitController {
 
 	// Spring MVC calls method loadPetWithVisit(...) before processNewVisitForm is called
 	@PostMapping("/owners/{ownerId}/pets/{petId}/visits/new")
-	public String processNewVisitForm(@Valid Visit visit, BindingResult result) {
+	public String processNewVisitForm(@Valid Visit visit, BindingResult result, Map<String, Object> model) {
 		if (result.hasErrors()) {
 			return "pets/createOrUpdateVisitForm";
 		}
@@ -145,20 +149,21 @@ class VisitController {
 			String[] timeSlots = visit.getStartTime().split("-");
 			visit.setStartTime(timeSlots[0]);
 			visit.setEndTime(timeSlots[1]);
-			this.visits.save(visit);
+			try {
+				this.visits.save(visit);
+			} catch (Exception ex ){
+				model.put("pageErrors","This slot has already been booked by someone! Please choose a different slot.");
+				return "pets/createOrUpdateVisitForm";
+			}
 			return "redirect:/owners/{ownerId}";
 		}
 	}
 
-	@PostMapping("/owners/{ownerId}/pets/{petId}/visits{visitId}/delete")
-	public String processDeleteVisitForm(@Valid Visit visit, BindingResult result) {
-		if (result.hasErrors()) {
-			return "pets/createOrUpdateVisitForm";
-		}
-		else {
-			this.visits.deleteVisitById(visit.getId());
+	@GetMapping("/owners/{ownerId}/pets/{petId}/visits/delete/{visitId}")
+	public String processDeleteVisitForm(@PathVariable("visitId") int visitId, Map<String, Object> model) {
+
+			this.visits.deleteVisitById(visitId);
 			return "redirect:/owners/{ownerId}";
-		}
 	}
 
 }

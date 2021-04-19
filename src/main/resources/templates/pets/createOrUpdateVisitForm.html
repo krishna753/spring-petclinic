@@ -38,7 +38,7 @@
 <!--                th:value="${vet.id}"-->
 <!--                th:utext="${vet.toString()}"/>-->
       <input
-        th:replace="~{fragments/inputField :: input ('Date', 'date', 'date')}"  />
+        th:replace="~{fragments/inputField :: input ('Date', 'date', 'date')}" />
       <input
         th:replace="~{fragments/selectField :: select ('Time slot', 'startTime', ${timeSlots})}" />
 <!--      <input-->
@@ -51,8 +51,13 @@
       <div class="col-sm-offset-2 col-sm-10">
         <input type="hidden" name="petId" th:value="${pet.id}" />
         <button class="btn btn-default" type="submit">Add Visit</button>
+        <br>
+        <br>
+        <div
+          th:text="${pageErrors}" th:style="'color: red'"></div>
       </div>
     </div>
+
   </form>
 
   <br />
