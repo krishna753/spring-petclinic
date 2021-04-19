@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Juergen Hoeller
@@ -67,12 +68,15 @@ class VetController {
 		else {
 			Collection<Specialty> allSpecialties = specialtyRepository.findAll();
 			for (String sp : specialties) {
-				Specialty selectedSpecialty = allSpecialties.stream().filter(p -> p.getName().equalsIgnoreCase(sp))
-						.findFirst().get();
-				selectedSpecialty.getVets().add(vet);
-				vet.addSpecialty(selectedSpecialty);
+				Optional<Specialty> optionalSpecialty = allSpecialties.stream().filter(p -> p.getName().equalsIgnoreCase(sp))
+						.findFirst();
+				Specialty selectedSpecialty=null;
+				if(optionalSpecialty.isPresent()) {
+					selectedSpecialty = optionalSpecialty.get();
+					selectedSpecialty.getVets().add(vet);
+					vet.addSpecialty(selectedSpecialty);
+				}
 			}
-
 			this.vets.save(vet);
 			return "redirect:/vets.html";
 		}

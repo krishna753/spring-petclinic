@@ -45,7 +45,9 @@ class VisitController {
 
 	private final VetRepository vets;
 
-	private final Integer MINUTES_BETWEEN_8AM_5PM = 9*60;
+	// TODO: Should be configurable via config properties
+	private static final Integer MINUTES_BETWEEN_8AM_5PM = 9 * 60;
+
 	@Value("${application.pet.visit.timeslot.duration}")
 	private Integer visitDuration;
 
@@ -70,28 +72,26 @@ class VisitController {
 		return "";
 	}
 
-	private String[] getTimeSet( int visitDuration) {
+	private String[] getTimeSet(int visitDuration) {
 
 		Calendar cal = new GregorianCalendar();
-// reset hour, minutes, seconds and millis
 		cal.set(Calendar.HOUR_OF_DAY, 8);
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MILLISECOND, 0);
 
 		SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
-		int slots = MINUTES_BETWEEN_8AM_5PM/visitDuration;
+		int slots = MINUTES_BETWEEN_8AM_5PM / visitDuration;
 		String[] results = new String[slots];
-		int index=0;
+		int index = 0;
 		while (index < slots) {
 			String startTime = sdf.format(cal.getTime());
 			cal.add(Calendar.MINUTE, visitDuration);
 			String endTime = sdf.format(cal.getTime());
-
-			results[index++] =startTime+"-"+endTime;
+			results[index++] = startTime + "-" + endTime;
 		}
 		return results;
-}
+	}
 
 	@InitBinder
 	public void setAllowedFields(WebDataBinder dataBinder) {
@@ -109,8 +109,6 @@ class VisitController {
 	@ModelAttribute("visit")
 	public Visit loadPetWithPreviousVisit(@PathVariable("petId") int petId, Map<String, Object> model) {
 		Pet pet = this.pets.findById(petId);
-//		List<Visit> visits = this.visits.findByPetId(petId).stream().filter(v -> LocalDate.now().isAfter(v.getDate()))
-//				.collect(Collectors.toList());
 		List<Visit> visits = this.visits.findByPetId(petId);
 		pet.setVisitsInternal(visits);
 		model.put("pet", pet);
@@ -118,20 +116,6 @@ class VisitController {
 		pet.addVisit(visit);
 		return visit;
 	}
-
-//	@ModelAttribute("upcomingVisit")
-//	public Visit loadPetWithUpcomingVisit(@PathVariable("petId") int petId, Map<String, Object> model) {
-//		Pet pet = this.pets.findById(petId);
-//		List<Visit> visits = this.visits.findByPetId(petId).stream()
-//			.filter(v -> LocalDate.now()
-//				.isBefore(v.getDate()) || LocalDate.now().isEqual(v.getDate()))
-//				.collect(Collectors.toList());
-//		pet.setVisitsInternal(visits);
-//		model.put("upet", pet);
-//		Visit visit = new Visit();
-//		pet.addVisit(visit);
-//		return visit;
-//	}
 
 	// Spring MVC calls method loadPetWithVisit(...) before initNewVisitForm is called
 	@GetMapping("/owners/*/pets/{petId}/visits/new")
@@ -151,8 +135,10 @@ class VisitController {
 			visit.setEndTime(timeSlots[1]);
 			try {
 				this.visits.save(visit);
-			} catch (Exception ex ){
-				model.put("pageErrors","This slot has already been booked by someone! Please choose a different slot.");
+			}
+			catch (Exception ex) {
+				model.put("pageErrors",
+						"This slot has already been booked by someone! Please choose a different slot.");
 				return "pets/createOrUpdateVisitForm";
 			}
 			return "redirect:/owners/{ownerId}";
@@ -161,9 +147,8 @@ class VisitController {
 
 	@GetMapping("/owners/{ownerId}/pets/{petId}/visits/delete/{visitId}")
 	public String processDeleteVisitForm(@PathVariable("visitId") int visitId, Map<String, Object> model) {
-
-			this.visits.deleteVisitById(visitId);
-			return "redirect:/owners/{ownerId}";
+		this.visits.deleteVisitById(visitId);
+		return "redirect:/owners/{ownerId}";
 	}
 
 }

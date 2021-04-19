@@ -70,10 +70,6 @@
               <td th:text="${visit.endTime}"></td>
               <td th:text="${visit?.getVet().firstName + ' ' + visit?.getVet().lastName}"></td>
               <td th:text="${visit?.description}"></td>
-<!--              krishna: added visit redirect-->
-<!--              <td><a-->
-<!--                th:href="@{visits/{visitId}/delete(visitId=${visit.id})}">Cancel Visit</a>-->
-<!--              </td>-->
               <td><a
                 th:href="@{{ownerId}/pets/{petId}/visits/delete/{visitId}(ownerId=${owner.id},petId=${pet.id},visitId=${visit.id})}">Cancel
                 Visit</a></td>

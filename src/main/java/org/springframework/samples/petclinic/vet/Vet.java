@@ -36,10 +36,8 @@ import java.util.*;
 @Table(name = "vets")
 public class Vet extends Person {
 
-
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "vet")
 	private List<Visit> visits;
-
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE })
 	@JoinTable(name = "vet_specialties", joinColumns = @JoinColumn(name = "vet_id"),
@@ -70,10 +68,6 @@ public class Vet extends Person {
 
 	public void addSpecialty(Specialty specialty) {
 		getSpecialtiesInternal().add(specialty);
-	}
-
-	public void removeSpecialty(Specialty specialty) {
-		getSpecialtiesInternal().remove(specialty);
 	}
 
 	public Set<Specialty> getSpecialties() {

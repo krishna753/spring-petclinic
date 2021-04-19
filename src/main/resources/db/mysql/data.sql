@@ -47,7 +47,7 @@ INSERT IGNORE INTO pets VALUES (11, 'Freddy', '2000-03-09', 5, 9);
 INSERT IGNORE INTO pets VALUES (12, 'Lucky', '2000-06-24', 2, 10);
 INSERT IGNORE INTO pets VALUES (13, 'Sly', '2002-06-08', 1, 10);
 
-INSERT IGNORE INTO visits VALUES (1, 7,1, '2010-03-04', '9am','10am','rabies shot');
-INSERT IGNORE INTO visits VALUES (2, 8,2, '2011-03-04', '9am','10am','rabies shot');
-INSERT IGNORE INTO visits VALUES (3, 8,1, '2009-06-04','9am','10am', 'neutered');
-INSERT IGNORE INTO visits VALUES (4, 7,2, '2008-09-04', '9am','10am','spayed');
+INSERT IGNORE INTO visits VALUES (1, 7,1, '2013-01-01','9:00 AM','9:30 AM','rabies shot');
+INSERT IGNORE INTO visits VALUES (2, 8,2, '2013-01-02', '9:00 AM','9:30 AM','rabies shot');
+INSERT IGNORE INTO visits VALUES (3, 8,1, '2013-01-03','11:30 AM','12:00 PM', 'neutered');
+INSERT IGNORE INTO visits VALUES (4, 7,2, '2013-01-04', '2:30 PM','3:00 PM','spayed');

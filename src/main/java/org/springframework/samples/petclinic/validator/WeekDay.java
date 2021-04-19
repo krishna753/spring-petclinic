@@ -9,7 +9,11 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = WeekDayValidator.class)
 @Documented
 public @interface WeekDay {
-    String message() default "{WeekDay.message}";
-    Class<?>[] groups() default {};
-    Class<? extends Payload>[] payload() default {};
+
+	String message() default "{WeekDay.message}";
+
+	Class<?>[] groups() default {};
+
+	Class<? extends Payload>[] payload() default {};
+
 }

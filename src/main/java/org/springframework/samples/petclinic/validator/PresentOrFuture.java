@@ -9,7 +9,11 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = PresentOrFutureValidator.class)
 @Documented
 public @interface PresentOrFuture {
-    String message() default "{PresentOrFuture.message}";
-    Class<?>[] groups() default {};
-    Class<? extends Payload>[] payload() default {};
+
+	String message() default "{PresentOrFuture.message}";
+
+	Class<?>[] groups() default {};
+
+	Class<? extends Payload>[] payload() default {};
+
 }
