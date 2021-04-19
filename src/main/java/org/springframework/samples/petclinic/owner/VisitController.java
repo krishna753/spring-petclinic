@@ -15,7 +15,9 @@
  */
 package org.springframework.samples.petclinic.owner;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.samples.petclinic.vet.Vet;
 import org.springframework.samples.petclinic.vet.VetRepository;
 import org.springframework.samples.petclinic.visit.Visit;
@@ -27,7 +29,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.GregorianCalendar;
+import java.util.Map;
 
 /**
  * @author Juergen Hoeller
@@ -37,6 +42,7 @@ import java.util.*;
  * @author Dave Syer
  */
 @Controller
+@Slf4j
 class VisitController {
 
 	private final VisitRepository visits;
@@ -49,7 +55,15 @@ class VisitController {
 	private static final Integer MINUTES_BETWEEN_8AM_5PM = 9 * 60;
 
 	@Value("${application.pet.visit.timeslot.duration}")
-	private Integer visitDuration;
+	private Integer visitDuration=30;
+
+	private static final String VISIT_SAVE_EXCEPTION = "Exception occured during saving visit. Please try again!";
+
+	private static final String SLOT_ALREADY_BOOKED = "This slot has already been booked by someone! Please choose a different slot.";
+
+	private static final String CREATE_OR_UPDATE_VISIT_FORM_PATH = "pets/createOrUpdateVisitForm";
+
+	private static final String REDIRECT_OWNER_DETAIL_PAGE = "redirect:/owners/{ownerId}";
 
 	public VisitController(VisitRepository visits, PetRepository pets, VetRepository vets) {
 		this.visits = visits;
@@ -72,6 +86,8 @@ class VisitController {
 		return "";
 	}
 
+	// Calculate time windows/slots to populate in dropdown
+	// TODO: Filter out the timeslots that a Vet is already booked for.
 	private String[] getTimeSet(int visitDuration) {
 
 		Calendar cal = new GregorianCalendar();
@@ -105,12 +121,10 @@ class VisitController {
 	 * @param petId
 	 * @return Pet
 	 */
-
 	@ModelAttribute("visit")
-	public Visit loadPetWithPreviousVisit(@PathVariable("petId") int petId, Map<String, Object> model) {
+	public Visit loadPetWithVisit(@PathVariable("petId") int petId, Map<String, Object> model) {
 		Pet pet = this.pets.findById(petId);
-		List<Visit> visits = this.visits.findByPetId(petId);
-		pet.setVisitsInternal(visits);
+		pet.setVisitsInternal(this.visits.findByPetId(petId));
 		model.put("pet", pet);
 		Visit visit = new Visit();
 		pet.addVisit(visit);
@@ -120,14 +134,18 @@ class VisitController {
 	// Spring MVC calls method loadPetWithVisit(...) before initNewVisitForm is called
 	@GetMapping("/owners/*/pets/{petId}/visits/new")
 	public String initNewVisitForm(@PathVariable("petId") int petId, Map<String, Object> model) {
-		return "pets/createOrUpdateVisitForm";
+		return CREATE_OR_UPDATE_VISIT_FORM_PATH;
 	}
 
 	// Spring MVC calls method loadPetWithVisit(...) before processNewVisitForm is called
+	// Use the selected timeSlot from drop down and persist it as start,end time for
+	// Visits
+	// If unable to save due to Unique constraint violation, throw a Frontend error.
+	// TODO: A filtered time slot drop down will avoid this exception.
 	@PostMapping("/owners/{ownerId}/pets/{petId}/visits/new")
 	public String processNewVisitForm(@Valid Visit visit, BindingResult result, Map<String, Object> model) {
 		if (result.hasErrors()) {
-			return "pets/createOrUpdateVisitForm";
+			return CREATE_OR_UPDATE_VISIT_FORM_PATH;
 		}
 		else {
 			String[] timeSlots = visit.getStartTime().split("-");
@@ -136,19 +154,26 @@ class VisitController {
 			try {
 				this.visits.save(visit);
 			}
-			catch (Exception ex) {
-				model.put("pageErrors",
-						"This slot has already been booked by someone! Please choose a different slot.");
-				return "pets/createOrUpdateVisitForm";
+			catch (DataIntegrityViolationException ex) {
+				model.put("pageErrors", SLOT_ALREADY_BOOKED);
+				return CREATE_OR_UPDATE_VISIT_FORM_PATH;
 			}
-			return "redirect:/owners/{ownerId}";
+			return REDIRECT_OWNER_DETAIL_PAGE;
 		}
 	}
 
+	// Delete visit
 	@GetMapping("/owners/{ownerId}/pets/{petId}/visits/delete/{visitId}")
 	public String processDeleteVisitForm(@PathVariable("visitId") int visitId, Map<String, Object> model) {
-		this.visits.deleteVisitById(visitId);
-		return "redirect:/owners/{ownerId}";
+		try {
+			this.visits.deleteVisitById(visitId);
+		}
+		catch (Exception ex) {
+			log.error(VISIT_SAVE_EXCEPTION);
+			model.put("pageErrors", VISIT_SAVE_EXCEPTION);
+			return CREATE_OR_UPDATE_VISIT_FORM_PATH;
+		}
+		return REDIRECT_OWNER_DETAIL_PAGE;
 	}
 
 }

@@ -19,4 +19,5 @@ public class PresentOrFutureValidator implements ConstraintValidator<PresentOrFu
 		calendar.set(Calendar.SECOND, 0);
 		return LocalDate.now().isBefore(value) || LocalDate.now().isEqual(value);
 	}
+
 }

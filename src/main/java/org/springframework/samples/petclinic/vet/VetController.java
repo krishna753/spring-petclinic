@@ -15,6 +15,8 @@
  */
 package org.springframework.samples.petclinic.vet;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.petclinic.Cache.CachingController;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -42,6 +44,9 @@ class VetController {
 
 	private final SpecialtyRepository specialtyRepository;
 
+	@Autowired
+	private CachingController cachingController;
+
 	public VetController(VetRepository clinicService, SpecialtyRepository specialtyRepository) {
 		this.vets = clinicService;
 		this.specialtyRepository = specialtyRepository;
@@ -68,15 +73,16 @@ class VetController {
 		else {
 			Collection<Specialty> allSpecialties = specialtyRepository.findAll();
 			for (String sp : specialties) {
-				Optional<Specialty> optionalSpecialty = allSpecialties.stream().filter(p -> p.getName().equalsIgnoreCase(sp))
-						.findFirst();
-				Specialty selectedSpecialty=null;
-				if(optionalSpecialty.isPresent()) {
+				Optional<Specialty> optionalSpecialty = allSpecialties.stream()
+						.filter(p -> p.getName().equalsIgnoreCase(sp)).findFirst();
+				Specialty selectedSpecialty = null;
+				if (optionalSpecialty.isPresent()) {
 					selectedSpecialty = optionalSpecialty.get();
 					selectedSpecialty.getVets().add(vet);
 					vet.addSpecialty(selectedSpecialty);
 				}
 			}
+			cachingController.clearVetsCache();
 			this.vets.save(vet);
 			return "redirect:/vets.html";
 		}

@@ -68,7 +68,7 @@
               <td th:text="${#temporals.format(visit.date, 'yyyy-MM-dd')}"></td>
               <td th:text="${visit.startTime}"></td>
               <td th:text="${visit.endTime}"></td>
-              <td th:text="${visit?.getVet().firstName + ' ' + visit?.getVet().lastName}"></td>
+              <td th:text="${visit?.getVet()?.firstName + ' ' + visit?.getVet()?.lastName}"></td>
               <td th:text="${visit?.description}"></td>
               <td><a
                 th:href="@{{ownerId}/pets/{petId}/visits/delete/{visitId}(ownerId=${owner.id},petId=${pet.id},visitId=${visit.id})}">Cancel
